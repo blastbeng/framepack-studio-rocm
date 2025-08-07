@@ -1,25 +1,34 @@
 services:
-  studio:
+  fp-studio-rocm:
     build:
-      # modify this if you are building the image locally and need a different CUDA version
-      args:
-        - CUDA_VERSION=12.4.1
-    # modify the tag here if you need a different CUDA version or branch
-    image: colinurbs/fp-studio:cuda12.4-latest-develop
+      context: .
+      dockerfile: Dockerfile
+    pull_policy: build
+    stdin_open: true
+    tty: true
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp=unconfined
+    ipc: host
+    shm_size: 8G
+    image: blastbeng/fp-studio-rocm:latest
+    runtime: "amd"
+    container_name: fp-studio-rocm
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    devices:
+      - /dev/dxg
     restart: unless-stopped
     ports:
       - "7860:7860"
     volumes:
+      - /usr/lib/wsl/lib/libdxcore.so:/usr/lib/libdxcore.so
+      - /opt/rocm/lib/libhsa-runtime64.so.1:/opt/rocm/lib/libhsa-runtime64.so.1
       - "./loras:/app/loras"
-      - "./outputs:/app/outputs"
+      - "/mnt/d/generated_videos:/app/outputs"
+      - "./temp:/app/temp"
       - "./.framepack:/app/.framepack"
       - "./modules/toolbox/model_esrgan:/app/modules/toolbox/model_esrgan"
       - "./modules/toolbox/model_rife:/app/modules/toolbox/model_rife"
       - "$HOME/.cache/huggingface:/app/hf_download"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
