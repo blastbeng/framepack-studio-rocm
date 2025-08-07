@@ -171,14 +171,14 @@ if not high_vram:
     vae.enable_tiling()
 
 # VAE Tiling size
-#vae.enable_tiling(
-#    tile_sample_min_height=128,  #256
-#    tile_sample_min_width=128,   #256
-#    tile_sample_min_num_frames=12,  #16
-#    tile_sample_stride_height=96,  #292
-#    tile_sample_stride_width=96,   #192
-#    tile_sample_stride_num_frames=10   #12
-#)
+vae.enable_tiling(
+    tile_sample_min_height=128,  #256
+    tile_sample_min_width=128,   #256
+    tile_sample_min_num_frames=12,  #16
+    tile_sample_stride_height=96,  #292
+    tile_sample_stride_width=96,   #192
+    tile_sample_stride_num_frames=10   #12
+)
 
 vae.to(dtype=torch.float16)
 image_encoder.to(dtype=torch.float16)
