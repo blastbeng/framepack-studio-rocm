@@ -39,8 +39,9 @@ RUN rm -rf flash-attention
 # Copy the source code to /app
 COPY . .
 
-RUN ln -s /app/modules/toolbox/bin/ffmpeg /usr/bin/ffmpeg
-RUN ln -s /app/modules/toolbox/bin/ffprobe /usr/bin/ffprobe
+RUN mkdir -p /app/modules/toolbox/bin
+RUN ln -s /usr/bin/ffmpeg /app/modules/toolbox/bin/ffmpeg
+RUN ln -s /usr/bin/ffprobe /app/modules/toolbox/bin/ffprobe
 
 VOLUME [ "/app/.framepack", "/app/outputs", "/app/loras", "/app/hf_download", "/app/modules/toolbox/model_esrgan", "/app/modules/toolbox/model_rife" ]
 
