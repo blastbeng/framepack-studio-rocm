@@ -16,6 +16,13 @@ torch.backends.cuda.enable_math_sdp(True)
 torch.backends.cuda.enable_mem_efficient_sdp(False)
 if hasattr(torch.backends.cuda, "enable_cudnn_sdp"):
     torch.backends.cuda.enable_cudnn_sdp(False)
+
+print(f"FramePack Studio ROCM")
+print(f"GPU: {torch.cuda.get_device_name()}")
+print(f"PyTorch: {torch.__version__}")
+import sys
+print(f"Python: {sys.version}")
+
 import datetime
 
 # Version information
