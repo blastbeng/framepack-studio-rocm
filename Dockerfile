@@ -1,28 +1,24 @@
-ARG CUDA_VERSION=12.4.1
-
-#FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu22.04
 FROM rocm/pytorch:rocm6.4.2_ubuntu24.04_py3.12_pytorch_release_2.6.0
-
-ARG CUDA_VERSION
+#FROM rocm/pytorch:rocm6.4.1_ubuntu24.04_py3.12_pytorch_release_2.7.1
+#FROM python:3.11.13-bullseye
 
 RUN apt-get update && apt-get install -y \
-    python3 python3-pip git ffmpeg wget curl && \
-    pip3 install --upgrade pip
+    python3 python3-pip git ffmpeg wget curl
 
 WORKDIR /app
 
-# This allows caching pip install if only code has changed
 COPY requirements.txt .
-
-# Install dependencies
-#RUN pip3 install --no-cache-dir -r requirements.txt
-#RUN export CUDA_SHORT_VERSION=$(echo "${CUDA_VERSION}" | sed 's/\.//g' | cut -c 1-3) && \
-#    pip3 install --no-cache-dir torch torchvision torchaudio --index-url "https://download.pytorch.org/whl/cu${CUDA_SHORT_VERSION}"
 
 RUN pip3 install -U pip
 RUN pip3 install -r requirements.txt
-RUN pip3 uninstall -y torch torchvision pytorch-triton-rocm
-RUN pip3 install https://repo.radeon.com/rocm/manylinux/rocm-rel-6.4.2/torch-2.6.0%2Brocm6.4.2.git76481f7c-cp312-cp312-linux_x86_64.whl https://repo.radeon.com/rocm/manylinux/rocm-rel-6.4.2/torchvision-0.21.0%2Brocm6.4.2.git4040d51f-cp312-cp312-linux_x86_64.whl https://repo.radeon.com/rocm/manylinux/rocm-rel-6.4.2/pytorch_triton_rocm-3.2.0%2Brocm6.4.2.git7e948ebf-cp312-cp312-linux_x86_64.whl https://repo.radeon.com/rocm/manylinux/rocm-rel-6.4.2/torchaudio-2.6.0%2Brocm6.4.2.gitd8831425-cp312-cp312-linux_x86_64.whl
+RUN pip3 uninstall -y torch torchvision torchaudio pytorch-triton-rocm
+#RUN pip3 install https://repo.radeon.com/rocm/manylinux/rocm-rel-6.4.2/torch-2.6.0%2Brocm6.4.2.git76481f7c-cp312-cp312-linux_x86_64.whl https://repo.radeon.com/rocm/manylinux/rocm-rel-6.4.2/torchvision-0.21.0%2Brocm6.4.2.git4040d51f-cp312-cp312-linux_x86_64.whl https://repo.radeon.com/rocm/manylinux/rocm-rel-6.4.2/pytorch_triton_rocm-3.2.0%2Brocm6.4.2.git7e948ebf-cp312-cp312-linux_x86_64.whl https://repo.radeon.com/rocm/manylinux/rocm-rel-6.4.2/torchaudio-2.6.0%2Brocm6.4.2.gitd8831425-cp312-cp312-linux_x86_64.whl
+#RUN pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0 --index-url  https://download.pytorch.org/whl/cu128_full --force-reinstall
+#RUN pip install torch==2.8.0.dev20250627 torchvision==0.23.0.dev20250627 torchaudio==2.8.0.dev20250627 --index-url  https://download.pytorch.org/whl/nightly/rocm6.4
+RUN pip install torch==2.8.0.dev20250625 torchvision==0.23.0.dev20250626 torchaudio==2.8.0.dev20250626 pytorch-triton-rocm==3.3.1+gitc8757738 --index-url  https://download.pytorch.org/whl/nightly/rocm6.4
+
+#RUN pip install triton==3.4.0 --index-url https://download.pytorch.org/whl/nightly
+
 
 RUN rm $(pip3 show torch | grep Location | awk -F ": " '{print $2}')/torch/lib/libhsa-runtime64.so*
 
@@ -36,7 +32,6 @@ RUN python setup.py install
 WORKDIR /app
 RUN rm -rf flash-attention
 
-# Copy the source code to /app
 COPY . .
 
 RUN mkdir -p /app/modules/toolbox/bin
