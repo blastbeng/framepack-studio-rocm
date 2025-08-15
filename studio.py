@@ -166,9 +166,9 @@ text_encoder.eval()
 text_encoder_2.eval()
 image_encoder.eval()
 
-if not high_vram:
-    vae.enable_slicing()
-    vae.enable_tiling()
+#if not high_vram:
+#    vae.enable_slicing()
+#    vae.enable_tiling()
 
 # VAE Tiling size
 vae.enable_tiling(

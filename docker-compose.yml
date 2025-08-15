@@ -17,6 +17,12 @@ services:
     container_name: fp-studio-rocm
     environment:
       - CUDA_VISIBLE_DEVICES=0
+      - HIP_PLATFORM=amd
+      - PYTORCH_HIP_FALLBACK=1
+      - PYTORCH_HIP_ALLOC_CONF=expandable_segments:True,max_split_size_mb:512
+      - HSA_ENABLE_SDMA=1
+      - HSA_ENABLE_PEER_SDMA=1
+    #  - LD_PRELOAD=/usr/local/lib/libforcegttalloc.so
     devices:
       - /dev/dxg
     restart: unless-stopped
@@ -26,8 +32,7 @@ services:
       - /usr/lib/wsl/lib/libdxcore.so:/usr/lib/libdxcore.so
       - /opt/rocm/lib/libhsa-runtime64.so.1:/opt/rocm/lib/libhsa-runtime64.so.1
       - "./loras:/app/loras"
-      - "/mnt/d/generated_videos:/app/outputs"
-      - "./temp:/app/temp"
+      - "/mnt/d/generated:/app/outputs"
       - "./.framepack:/app/.framepack"
       - "./modules/toolbox/model_esrgan:/app/modules/toolbox/model_esrgan"
       - "./modules/toolbox/model_rife:/app/modules/toolbox/model_rife"

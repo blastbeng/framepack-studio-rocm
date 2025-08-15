@@ -24,7 +24,7 @@ RUN rm $(pip3 show torch | grep Location | awk -F ": " '{print $2}')/torch/lib/l
 
 RUN pip3 install -q transformers accelerate matplotlib hiredis
 
-RUN git clone --single-branch --branch main_perf https://github.com/ROCm/flash-attention.git
+RUN git clone --single-branch --branch main_perf https://github.com/ROCm/flash-attention
 WORKDIR  /app/flash-attention/
 ENV FLASH_ATTENTION_TRITON_AMD_ENABLE="TRUE"
 ENV GPU_ARCHS="gfx1101"
@@ -32,11 +32,17 @@ RUN python setup.py install
 WORKDIR /app
 RUN rm -rf flash-attention
 
-COPY . .
+
+RUN git clone https://github.com/segurac/force-host-alloction-APU
+RUN CUDA_PATH=/usr/ HIP_PLATFORM="amd" hipcc force-host-alloction-APU/forcegttalloc.c -o force-host-alloction-APU/libforcegttalloc.so  -shared -fPIC
+RUN mv force-host-alloction-APU/libforcegttalloc.so /usr/local/lib
+RUN rm -rf force-host-alloction-APU
 
 RUN mkdir -p /app/modules/toolbox/bin
 RUN ln -s /usr/bin/ffmpeg /app/modules/toolbox/bin/ffmpeg
 RUN ln -s /usr/bin/ffprobe /app/modules/toolbox/bin/ffprobe
+
+COPY . .
 
 VOLUME [ "/app/.framepack", "/app/outputs", "/app/loras", "/app/hf_download", "/app/modules/toolbox/model_esrgan", "/app/modules/toolbox/model_rife" ]
 
